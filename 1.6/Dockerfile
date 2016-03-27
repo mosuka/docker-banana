@@ -61,7 +61,9 @@ RUN cp ${BANANA_PREFIX}/build/banana.war ${JETTY_PREFIX}/webapps/.
 ADD docker-run.sh /usr/local/bin/
 ADD docker-stop.sh /usr/local/bin/
 
-EXPOSE 8080
+ENV JETTY_HTTP_PORT=5601
+
+EXPOSE 5601
 USER ${BANANA_USER}
 
 WORKDIR ${JETTY_PREFIX}

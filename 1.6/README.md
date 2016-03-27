@@ -4,7 +4,7 @@ Docker image for Banana.
 ### 1. Start Banana
 
 ```sh
-$ docker run -d -p 9090:8080 --name banana mosuka/docker-banana:release-1.6
+$ docker run -d -p 5602:5601 --name banana mosuka/docker-banana:release-1.6
 3f2efe1c75316e53b19e90df4c13210a16eac3b88e0c161c07ce05e883bed270
 ```
 
@@ -31,9 +31,9 @@ $ BANANA_HOST_IP=$(docker-machine ip default)
 $ echo ${BANANA_HOST_IP}
 192.168.99.100
 
-$ BANANA_HOST_PORT=$(docker inspect -f '{{ $port := index .NetworkSettings.Ports "8080/tcp" }}{{ range $port }}{{ .HostPort }}{{ end }}' banana)
+$ BANANA_HOST_PORT=$(docker inspect -f '{{ $port := index .NetworkSettings.Ports "5601/tcp" }}{{ range $port }}{{ .HostPort }}{{ end }}' banana)
 $ echo ${BANANA_HOST_PORT}
-9090
+5602
 ```
 
 ### 5. Open Solr Admin UI in a browser
@@ -41,7 +41,7 @@ $ echo ${BANANA_HOST_PORT}
 ```sh
 $ BANANA_DASHBOARD=http://${BANANA_HOST_IP}:${BANANA_HOST_PORT}/banana/#/dashboard
 $ echo ${BANANA_DASHBOARD}
-http://192.168.99.100:9090/banana/#/dashboard
+http://192.168.99.100:5602/banana/#/dashboard
 ```
 
 Open Banana Dashboard in a browser.

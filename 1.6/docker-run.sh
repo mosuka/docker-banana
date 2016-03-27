@@ -26,12 +26,18 @@
 
 # Set environment variables.
 JETTY_PREFIX=${JETTY_PREFIX:-/opt/jetty}
+JETTY_HTTP_PORT=${JETTY_HTTP_PORT:-5601}
 
 # Show environment variables.
 echo "JETTY_PREFIX=${JETTY_PREFIX}"
+echo "JETTY_HTTP_PORT=${JETTY_HTTP_PORT}"
 
 # Start function
 function start() {
+  # Change http port.
+  sed -e "s/^# jetty.http.port=.*/jetty.http.port=${JETTY_HTTP_PORT}/" ${JETTY_PREFIX}/start.ini > ${JETTY_PREFIX}/start.ini.tmp
+  mv ${JETTY_PREFIX}/start.ini.tmp ${JETTY_PREFIX}/start.ini
+
   # Start Jetty.
   ${JETTY_PREFIX}/bin/jetty.sh start
 }
