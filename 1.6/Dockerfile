@@ -54,8 +54,8 @@ RUN unzip banana-${BANANA_VERSION}.zip && rm ${INSTALL_DIR}/banana-${BANANA_VERS
 ENV BANANA_PREFIX ${INSTALL_DIR}/banana-${BANANA_VERSION}
 RUN chown -R ${BANANA_USER}:${BANANA_GROUP} ${BANANA_PREFIX}
 WORKDIR ${BANANA_PREFIX}
-RUN ant -Dbuld.number=${BANANA_VERSION}
-RUN cp ${BANANA_PREFIX}/build/banana-${BANANA_VERSION}.war ${BANANA_PREFIX}/webapps/.
+RUN ant -Dfinal.name=banana
+RUN cp ${BANANA_PREFIX}/build/banana.war ${JETTY_PREFIX}/webapps/.
 
 # Add start and stop script
 ADD docker-run.sh /usr/local/bin/
