@@ -30,7 +30,7 @@ $ docker run -d -p 5602:5601 --name banana mosuka/docker-banana:release-1.6
 ```sh
 $ docker ps
 CONTAINER ID        IMAGE                                 COMMAND                  CREATED             STATUS              PORTS                                         NAMES
-3f2efe1c7531        mosuka/docker-solr:release-5.x        "/usr/local/bin/docke"   2 minutes ago       Up 2 minutes        7983/tcp, 18983/tcp, 0.0.0.0:8984->8983/tcp   solr
+98716340f302        mosuka/docker-banana:release-1.6      "/usr/local/bin/docke"   50 seconds ago      Up 6 seconds        0.0.0.0:5602->5601/tcp                        banana
 ```
 
 #### 4. Get container IP
@@ -38,7 +38,7 @@ CONTAINER ID        IMAGE                                 COMMAND               
 ```sh
 $ BANANA_CONTAINER_IP=$(docker inspect -f '{{ .NetworkSettings.IPAddress }}' banana)
 $ echo ${BANANA_CONTAINER_IP}
-172.17.0.7
+172.17.0.9
 ```
 
 #### 5. Get host IP and port
@@ -63,7 +63,7 @@ http://192.168.99.100:5602/banana/#/dashboard
 
 Open Banana Dashboard in a browser.
 
-#### 7. Create Collection
+#### 7. Create logs Collection
 
 ```sh
 $ COLLECTION_NAME=httpd_logs
@@ -72,7 +72,140 @@ $ COLLECTION_CONFIG_NAME=data_driven_schema_configs
 $ REPLICATION_FACTOR=2
 $ MAX_SHARDS_PER_NODE=10
 $ CREATE_NODE_SET=$(echo $(curl -s "http://${SOLR_HOST_IP}:${SOLR_1_HOST_PORT}/solr/admin/collections?action=CLUSTERSTATUS&wt=json" | jq -r ".cluster.live_nodes[]") | sed -e 's/ /,/g')
-curl -s "http://${SOLR_HOST_IP}:${SOLR_1_HOST_PORT}/solr/admin/collections?action=CREATE&name=${COLLECTION_NAME}&numShards=${NUM_SHARDS}&replicationFactor=${REPLICATION_FACTOR}&maxShardsPerNode=${MAX_SHARDS_PER_NODE}&createNodeSet=${CREATE_NODE_SET}&collection.configName=${COLLECTION_CONFIG_NAME}" | xmllint --format -
+$ curl -s "http://${SOLR_HOST_IP}:${SOLR_1_HOST_PORT}/solr/admin/collections?action=CREATE&name=${COLLECTION_NAME}&numShards=${NUM_SHARDS}&replicationFactor=${REPLICATION_FACTOR}&maxShardsPerNode=${MAX_SHARDS_PER_NODE}&createNodeSet=${CREATE_NODE_SET}&collection.configName=${COLLECTION_CONFIG_NAME}" | xmllint --format -
+<?xml version="1.0" encoding="UTF-8"?>
+<response>
+  <lst name="responseHeader">
+    <int name="status">0</int>
+    <int name="QTime">8374</int>
+  </lst>
+  <lst name="success">
+    <lst>
+      <lst name="responseHeader">
+        <int name="status">0</int>
+        <int name="QTime">6510</int>
+      </lst>
+      <str name="core">httpd_logs_shard2_replica1</str>
+    </lst>
+    <lst>
+      <lst name="responseHeader">
+        <int name="status">0</int>
+        <int name="QTime">6952</int>
+      </lst>
+      <str name="core">httpd_logs_shard2_replica2</str>
+    </lst>
+    <lst>
+      <lst name="responseHeader">
+        <int name="status">0</int>
+        <int name="QTime">7466</int>
+      </lst>
+      <str name="core">httpd_logs_shard1_replica2</str>
+    </lst>
+    <lst>
+      <lst name="responseHeader">
+        <int name="status">0</int>
+        <int name="QTime">7978</int>
+      </lst>
+      <str name="core">httpd_logs_shard1_replica1</str>
+    </lst>
+  </lst>
+</response>
+
+$ curl -X POST -H 'Content-type:application/json' --data-binary '{
+  "add-field":{
+     "name":"event_timestamp",
+     "type":"date",
+     "indexed":"true",
+     "stored":"true",
+     "multiValued":false },
+  "add-field":{
+     "name":"message",
+     "type":"string",
+     "indexed":"true",
+     "stored":"true",
+     "multiValued":false }
+}' "http://${SOLR_HOST_IP}:${SOLR_1_HOST_PORT}/solr/${COLLECTION_NAME}/schema"
+
+```
+
+#### 8. Create Banana settings (banana-int) Collection
+
+```sh
+$ COLLECTION_NAME=bananaconfig
+$ NUM_SHARDS=2
+$ COLLECTION_CONFIG_NAME=data_driven_schema_configs
+$ REPLICATION_FACTOR=2
+$ MAX_SHARDS_PER_NODE=10
+$ CREATE_NODE_SET=$(echo $(curl -s "http://${SOLR_HOST_IP}:${SOLR_1_HOST_PORT}/solr/admin/collections?action=CLUSTERSTATUS&wt=json" | jq -r ".cluster.live_nodes[]") | sed -e 's/ /,/g')
+$ curl -s "http://${SOLR_HOST_IP}:${SOLR_1_HOST_PORT}/solr/admin/collections?action=CREATE&name=${COLLECTION_NAME}&numShards=${NUM_SHARDS}&replicationFactor=${REPLICATION_FACTOR}&maxShardsPerNode=${MAX_SHARDS_PER_NODE}&createNodeSet=${CREATE_NODE_SET}&collection.configName=${COLLECTION_CONFIG_NAME}" | xmllint --format -
+<?xml version="1.0" encoding="UTF-8"?>
+<response>
+  <lst name="responseHeader">
+    <int name="status">0</int>
+    <int name="QTime">6392</int>
+  </lst>
+  <lst name="success">
+    <lst>
+      <lst name="responseHeader">
+        <int name="status">0</int>
+        <int name="QTime">5702</int>
+      </lst>
+      <str name="core">bananaconfig_shard2_replica1</str>
+    </lst>
+    <lst>
+      <lst name="responseHeader">
+        <int name="status">0</int>
+        <int name="QTime">5782</int>
+      </lst>
+      <str name="core">bananaconfig_shard1_replica1</str>
+    </lst>
+    <lst>
+      <lst name="responseHeader">
+        <int name="status">0</int>
+        <int name="QTime">6042</int>
+      </lst>
+      <str name="core">bananaconfig_shard2_replica2</str>
+    </lst>
+    <lst>
+      <lst name="responseHeader">
+        <int name="status">0</int>
+        <int name="QTime">6141</int>
+      </lst>
+      <str name="core">bananaconfig_shard1_replica2</str>
+    </lst>
+  </lst>
+</response>
+
+$ curl -X POST -H 'Content-type:application/json' --data-binary '{
+  "add-field":{
+     "name":"user",
+     "type":"string",
+     "indexed":"true",
+     "stored":"true",
+     "multiValued":false },
+  "add-field":{
+     "name":"group",
+     "type":"string",
+     "indexed":"true",
+     "stored":"true",
+     "multiValued":false },
+  "add-field":{
+     "name":"title",
+     "type":"string",
+     "indexed":"true",
+     "stored":"true",
+     "multiValued":false },
+  "add-field":{
+     "name":"dashboard",
+     "type":"string",
+     "indexed":"false",
+     "stored":"true",
+     "multiValued":false }
+}' "http://${SOLR_HOST_IP}:${SOLR_1_HOST_PORT}/solr/${COLLECTION_NAME}/schema"
+{
+  "responseHeader":{
+    "status":0,
+    "QTime":942}}
 ```
 
 #### 8. Stop Banana

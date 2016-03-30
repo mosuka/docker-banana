@@ -47,9 +47,11 @@ ENV JETTY_PREFIX ${INSTALL_DIR}/jetty-distribution-${JETTY_VERSION}
 RUN chown -R ${BANANA_USER}:${BANANA_GROUP} ${JETTY_PREFIX} 
 
 # Install Banana
-ENV BANANA_VERSION release-1.6.0
+# ENV BANANA_VERSION release-1.6.0
+ENV BANANA_VERSION release
 WORKDIR ${INSTALL_DIR}
-RUN curl -L -o ${INSTALL_DIR}/banana-${BANANA_VERSION}.zip https://github.com/lucidworks/banana/archive/${BANANA_VERSION}.zip
+# RUN curl -L -o ${INSTALL_DIR}/banana-${BANANA_VERSION}.zip https://github.com/lucidworks/banana/archive/${BANANA_VERSION}.zip
+RUN curl -L -o ${INSTALL_DIR}/banana-${BANANA_VERSION}.zip https://github.com/mosuka/banana/archive/${BANANA_VERSION}.zip
 RUN unzip banana-${BANANA_VERSION}.zip && rm ${INSTALL_DIR}/banana-${BANANA_VERSION}.zip
 ENV BANANA_PREFIX ${INSTALL_DIR}/banana-${BANANA_VERSION}
 RUN chown -R ${BANANA_USER}:${BANANA_GROUP} ${BANANA_PREFIX}
