@@ -63,7 +63,43 @@ http://192.168.99.100:5602/banana/#/dashboard
 
 Open Banana Dashboard in a browser.
 
-#### 7. Create logs Collection
+#### 7. Create a core for indexing the httpd logs. (If it connect to Standalone Solr.)
+
+```sh
+$ CORE_NAME=httpd_logs
+$ CONFIG_SET=data_driven_schema_configs
+$ DATA_DIR=data
+$ curl -s "http://${SOLR_HOST_IP}:${SOLR_HOST_PORT}/solr/admin/cores?action=CREATE&name=${CORE_NAME}&configSet=${CONFIG_SET}&dataDir=${DATA_DIR}" | xmllint --format -
+<?xml version="1.0" encoding="UTF-8"?>
+<response>
+  <lst name="responseHeader">
+    <int name="status">0</int>
+    <int name="QTime">2944</int>
+  </lst>
+  <str name="core">collection1</str>
+</response>
+
+$ curl -X POST -H 'Content-type:application/json' --data-binary '{
+  "add-field":{
+     "name":"event_timestamp",
+     "type":"date",
+     "indexed":"true",
+     "stored":"true",
+     "multiValued":false },
+  "add-field":{
+     "name":"message",
+     "type":"string",
+     "indexed":"true",
+     "stored":"true",
+     "multiValued":false }
+}' "http://${SOLR_HOST_IP}:${SOLR_HOST_PORT}/solr/${CORE_NAME}/schema"
+{
+  "responseHeader":{
+    "status":0,
+    "QTime":155}}
+```
+
+#### 7. Create a collecton for indexing the httpd logs. (If it connect to SolrCloud.)
 
 ```sh
 $ COLLECTION_NAME=httpd_logs
@@ -125,10 +161,61 @@ $ curl -X POST -H 'Content-type:application/json' --data-binary '{
      "stored":"true",
      "multiValued":false }
 }' "http://${SOLR_HOST_IP}:${SOLR_1_HOST_PORT}/solr/${COLLECTION_NAME}/schema"
-
+{
+  "responseHeader":{
+    "status":0,
+    "QTime":155}}
 ```
 
-#### 8. Create Banana settings (banana-int) Collection
+#### 8. Create a core for Banana settings. (If it connect to Standalone Solr.)
+
+```sh
+$ CORE_NAME=bananaconfig
+$ CONFIG_SET=data_driven_schema_configs
+$ DATA_DIR=data
+$ curl -s "http://${SOLR_HOST_IP}:${SOLR_HOST_PORT}/solr/admin/cores?action=CREATE&name=${CORE_NAME}&configSet=${CONFIG_SET}&dataDir=${DATA_DIR}" | xmllint --format -
+<?xml version="1.0" encoding="UTF-8"?>
+<response>
+  <lst name="responseHeader">
+    <int name="status">0</int>
+    <int name="QTime">2944</int>
+  </lst>
+  <str name="core">collection1</str>
+</response>
+
+$ curl -X POST -H 'Content-type:application/json' --data-binary '{
+  "add-field":{
+     "name":"user",
+     "type":"string",
+     "indexed":"true",
+     "stored":"true",
+     "multiValued":false },
+  "add-field":{
+     "name":"group",
+     "type":"string",
+     "indexed":"true",
+     "stored":"true",
+     "multiValued":false },
+  "add-field":{
+     "name":"title",
+     "type":"string",
+     "indexed":"true",
+     "stored":"true",
+     "multiValued":false },
+  "add-field":{
+     "name":"dashboard",
+     "type":"string",
+     "indexed":"false",
+     "stored":"true",
+     "multiValued":false }
+}' "http://${SOLR_HOST_IP}:${SOLR_HOST_PORT}/solr/${CORE_NAME}/schema"
+{
+  "responseHeader":{
+    "status":0,
+    "QTime":155}}
+```
+
+#### 8. Create a collection for Banana settings. (If it connect to SolrCloud.)
 
 ```sh
 $ COLLECTION_NAME=bananaconfig
