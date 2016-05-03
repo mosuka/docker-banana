@@ -21,7 +21,7 @@ See [https://github.com/mosuka/docker-solr/tree/master/5.5](https://github.com/m
 #### 2. Start Banana
 
 ```sh
-$ docker run -d -p 5602:5601 --name banana mosuka/docker-banana:release-1.6
+$ docker run -d -p 5602:5601 --name banana mosuka/docker-banana:release-1.6.0
 3f2efe1c75316e53b19e90df4c13210a16eac3b88e0c161c07ce05e883bed270
 ```
 
@@ -53,7 +53,7 @@ $ echo ${BANANA_HOST_PORT}
 5602
 ```
 
-#### 6. Open Solr Admin UI in a browser
+#### 6. Open Banan dashboard in a browser
 
 ```sh
 $ BANANA_DASHBOARD=http://${BANANA_HOST_IP}:${BANANA_HOST_PORT}/banana/#/dashboard
@@ -76,7 +76,7 @@ $ curl -s "http://${SOLR_HOST_IP}:${SOLR_HOST_PORT}/solr/admin/cores?action=CREA
     <int name="status">0</int>
     <int name="QTime">2944</int>
   </lst>
-  <str name="core">collection1</str>
+  <str name="core">httpd_logs</str>
 </response>
 
 $ curl -X POST -H 'Content-type:application/json' --data-binary '{
@@ -180,7 +180,7 @@ $ curl -s "http://${SOLR_HOST_IP}:${SOLR_HOST_PORT}/solr/admin/cores?action=CREA
     <int name="status">0</int>
     <int name="QTime">2944</int>
   </lst>
-  <str name="core">collection1</str>
+  <str name="core">bananaconfig</str>
 </response>
 
 $ curl -X POST -H 'Content-type:application/json' --data-binary '{
