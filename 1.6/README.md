@@ -68,16 +68,20 @@ Open Banana Dashboard in a browser.
 ```sh
 $ CORE_NAME=httpd_logs
 $ CONFIG_SET=data_driven_schema_configs
-$ DATA_DIR=data
-$ curl -s "http://${SOLR_HOST_IP}:${SOLR_HOST_PORT}/solr/admin/cores?action=CREATE&name=${CORE_NAME}&configSet=${CONFIG_SET}&dataDir=${DATA_DIR}" | xmllint --format -
-<?xml version="1.0" encoding="UTF-8"?>
-<response>
-  <lst name="responseHeader">
-    <int name="status">0</int>
-    <int name="QTime">2944</int>
-  </lst>
-  <str name="core">httpd_logs</str>
-</response>
+$ docker exec -it solr ./bin/solr create_core -c ${CORE_NAME} -d ${CONFIG_SET}
+
+Copying configuration to new core instance directory:
+/opt/solr-5.5.0/server/solr/httpd_logs
+
+Creating new core 'httpd_logs' using command:
+http://localhost:8983/solr/admin/cores?action=CREATE&name=httpd_logs&instanceDir=httpd_logs
+
+{
+  "responseHeader":{
+    "status":0,
+    "QTime":848},
+  "core":"httpd_logs"}
+
 
 $ curl -X POST -H 'Content-type:application/json' --data-binary '{
   "add-field":{
@@ -103,49 +107,26 @@ $ curl -X POST -H 'Content-type:application/json' --data-binary '{
 
 ```sh
 $ COLLECTION_NAME=httpd_logs
-$ NUM_SHARDS=2
 $ COLLECTION_CONFIG_NAME=data_driven_schema_configs
+$ NUM_SHARDS=2
 $ REPLICATION_FACTOR=2
-$ MAX_SHARDS_PER_NODE=10
-$ CREATE_NODE_SET=$(echo $(curl -s "http://${SOLR_HOST_IP}:${SOLR_1_HOST_PORT}/solr/admin/collections?action=CLUSTERSTATUS&wt=json" | jq -r ".cluster.live_nodes[]") | sed -e 's/ /,/g')
-$ curl -s "http://${SOLR_HOST_IP}:${SOLR_1_HOST_PORT}/solr/admin/collections?action=CREATE&name=${COLLECTION_NAME}&numShards=${NUM_SHARDS}&replicationFactor=${REPLICATION_FACTOR}&maxShardsPerNode=${MAX_SHARDS_PER_NODE}&createNodeSet=${CREATE_NODE_SET}&collection.configName=${COLLECTION_CONFIG_NAME}" | xmllint --format -
-<?xml version="1.0" encoding="UTF-8"?>
-<response>
-  <lst name="responseHeader">
-    <int name="status">0</int>
-    <int name="QTime">8374</int>
-  </lst>
-  <lst name="success">
-    <lst>
-      <lst name="responseHeader">
-        <int name="status">0</int>
-        <int name="QTime">6510</int>
-      </lst>
-      <str name="core">httpd_logs_shard2_replica1</str>
-    </lst>
-    <lst>
-      <lst name="responseHeader">
-        <int name="status">0</int>
-        <int name="QTime">6952</int>
-      </lst>
-      <str name="core">httpd_logs_shard2_replica2</str>
-    </lst>
-    <lst>
-      <lst name="responseHeader">
-        <int name="status">0</int>
-        <int name="QTime">7466</int>
-      </lst>
-      <str name="core">httpd_logs_shard1_replica2</str>
-    </lst>
-    <lst>
-      <lst name="responseHeader">
-        <int name="status">0</int>
-        <int name="QTime">7978</int>
-      </lst>
-      <str name="core">httpd_logs_shard1_replica1</str>
-    </lst>
-  </lst>
-</response>
+$ docker exec -it solr1 ./bin/solr create_collection -c ${COLLECTION_NAME} -d ${COLLECTION_CONFIG_NAME} -n ${COLLECTION_NAME}_config -shards ${NUM_SHARDS} -replicationFactor ${REPLICATION_FACTOR}
+
+Connecting to ZooKeeper at 172.17.0.2:2181,172.17.0.3:2181,172.17.0.4:2181/solr ...
+Uploading /opt/solr-5.5.0/server/solr/configsets/data_driven_schema_configs/conf for config httpd_logs_config to ZooKeeper at 172.17.0.2:2181,172.17.0.3:2181,172.17.0.4:2181/solr
+
+Creating new collection 'httpd_logs' using command:
+http://localhost:8983/solr/admin/collections?action=CREATE&name=httpd_logs&numShards=2&replicationFactor=2&maxShardsPerNode=1&collection.configName=httpd_logs_config
+
+{
+  "responseHeader":{
+    "status":0,
+    "QTime":7699},
+  "success":{"":{
+      "responseHeader":{
+        "status":0,
+        "QTime":7335},
+      "core":"httpd_logs_shard1_replica1"}}}
 
 $ curl -X POST -H 'Content-type:application/json' --data-binary '{
   "add-field":{
@@ -172,16 +153,19 @@ $ curl -X POST -H 'Content-type:application/json' --data-binary '{
 ```sh
 $ CORE_NAME=bananaconfig
 $ CONFIG_SET=data_driven_schema_configs
-$ DATA_DIR=data
-$ curl -s "http://${SOLR_HOST_IP}:${SOLR_HOST_PORT}/solr/admin/cores?action=CREATE&name=${CORE_NAME}&configSet=${CONFIG_SET}&dataDir=${DATA_DIR}" | xmllint --format -
-<?xml version="1.0" encoding="UTF-8"?>
-<response>
-  <lst name="responseHeader">
-    <int name="status">0</int>
-    <int name="QTime">2944</int>
-  </lst>
-  <str name="core">bananaconfig</str>
-</response>
+$ docker exec -it solr ./bin/solr create_core -c ${CORE_NAME} -d ${CONFIG_SET}
+
+Copying configuration to new core instance directory:
+/opt/solr-5.5.0/server/solr/bananaconfig
+
+Creating new core 'bananaconfig' using command:
+http://localhost:8983/solr/admin/cores?action=CREATE&name=bananaconfig&instanceDir=bananaconfig
+
+{
+  "responseHeader":{
+    "status":0,
+    "QTime":848},
+  "core":"bananaconfig"}
 
 $ curl -X POST -H 'Content-type:application/json' --data-binary '{
   "add-field":{
@@ -219,49 +203,26 @@ $ curl -X POST -H 'Content-type:application/json' --data-binary '{
 
 ```sh
 $ COLLECTION_NAME=bananaconfig
-$ NUM_SHARDS=2
 $ COLLECTION_CONFIG_NAME=data_driven_schema_configs
+$ NUM_SHARDS=2
 $ REPLICATION_FACTOR=2
-$ MAX_SHARDS_PER_NODE=10
-$ CREATE_NODE_SET=$(echo $(curl -s "http://${SOLR_HOST_IP}:${SOLR_1_HOST_PORT}/solr/admin/collections?action=CLUSTERSTATUS&wt=json" | jq -r ".cluster.live_nodes[]") | sed -e 's/ /,/g')
-$ curl -s "http://${SOLR_HOST_IP}:${SOLR_1_HOST_PORT}/solr/admin/collections?action=CREATE&name=${COLLECTION_NAME}&numShards=${NUM_SHARDS}&replicationFactor=${REPLICATION_FACTOR}&maxShardsPerNode=${MAX_SHARDS_PER_NODE}&createNodeSet=${CREATE_NODE_SET}&collection.configName=${COLLECTION_CONFIG_NAME}" | xmllint --format -
-<?xml version="1.0" encoding="UTF-8"?>
-<response>
-  <lst name="responseHeader">
-    <int name="status">0</int>
-    <int name="QTime">6392</int>
-  </lst>
-  <lst name="success">
-    <lst>
-      <lst name="responseHeader">
-        <int name="status">0</int>
-        <int name="QTime">5702</int>
-      </lst>
-      <str name="core">bananaconfig_shard2_replica1</str>
-    </lst>
-    <lst>
-      <lst name="responseHeader">
-        <int name="status">0</int>
-        <int name="QTime">5782</int>
-      </lst>
-      <str name="core">bananaconfig_shard1_replica1</str>
-    </lst>
-    <lst>
-      <lst name="responseHeader">
-        <int name="status">0</int>
-        <int name="QTime">6042</int>
-      </lst>
-      <str name="core">bananaconfig_shard2_replica2</str>
-    </lst>
-    <lst>
-      <lst name="responseHeader">
-        <int name="status">0</int>
-        <int name="QTime">6141</int>
-      </lst>
-      <str name="core">bananaconfig_shard1_replica2</str>
-    </lst>
-  </lst>
-</response>
+$ docker exec -it solr1 ./bin/solr create_collection -c ${COLLECTION_NAME} -d ${COLLECTION_CONFIG_NAME} -n ${COLLECTION_NAME}_config -shards ${NUM_SHARDS} -replicationFactor ${REPLICATION_FACTOR}
+
+Connecting to ZooKeeper at 172.17.0.2:2181,172.17.0.3:2181,172.17.0.4:2181/solr ...
+Uploading /opt/solr-5.5.0/server/solr/configsets/data_driven_schema_configs/conf for config bananaconfig_config to ZooKeeper at 172.17.0.2:2181,172.17.0.3:2181,172.17.0.4:2181/solr
+
+Creating new collection 'bananaconfig' using command:
+http://localhost:8983/solr/admin/collections?action=CREATE&name=bananaconfig&numShards=2&replicationFactor=2&maxShardsPerNode=1&collection.configName=bananaconfig_config
+
+{
+  "responseHeader":{
+    "status":0,
+    "QTime":6147},
+  "success":{"":{
+      "responseHeader":{
+        "status":0,
+        "QTime":5902},
+      "core":"bananaconfig_shard1_replica1"}}}
 
 $ curl -X POST -H 'Content-type:application/json' --data-binary '{
   "add-field":{
